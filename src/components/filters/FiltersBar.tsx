@@ -29,9 +29,8 @@ import {
 } from "@/redux/features/tasks";
 
 const SORT_LABEL = {
-    newest: "Newest first",
-    oldest: "Oldest first",
-    priority: "By priority",
+    newest: "Newest",
+    oldest: "Oldest",
 };
 
 export function FiltersBar() {
