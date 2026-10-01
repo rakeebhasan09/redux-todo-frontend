@@ -10,7 +10,7 @@ export const selectTaskById = (state: RootState, id: string) =>
 
 export const selectTaskStats = createSelector([selectAllTasks], (tasks) => {
     const stats = {
-        total: tasks.length,
+        total: tasks?.length,
         byStatus: { pending: 0, "in-progress": 0, done: 0 },
         byPriority: { high: 0, medium: 0, low: 0 },
     };
@@ -20,7 +20,7 @@ export const selectTaskStats = createSelector([selectAllTasks], (tasks) => {
         stats.byStatus[task.status] += 1;
     }
 
-    stats.total = tasks.length;
+    stats.total = tasks?.length;
 
     return stats;
 });

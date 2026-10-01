@@ -1,24 +1,12 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import tasksReducer from "./features/tasks/tasks.slice";
 import filtersReducer from "./features/filters/filters.slice";
-import { persistReducer } from "redux-persist";
+import tasksReducer from "./features/tasks/tasks.slice";
+import { baseAPI } from "./baseAPI";
 
-const storage = {
-    getItem: (key: string) => Promise.resolve(localStorage.getItem(key)),
-    setItem: (key: string, value: string) =>
-        Promise.resolve(localStorage.setItem(key, value)),
-    removeItem: (key: string) => Promise.resolve(localStorage.removeItem(key)),
-};
-
-const persistConfig = {
-    key: "redux-store",
-    storage,
-    whitelist: ["tasks"],
-};
-
-export const combineReducer = combineReducers({
-    tasks: tasksReducer,
+export const rootReducer = combineReducers({
+    [baseAPI.reducerPath]: baseAPI.reducer,
     filters: filtersReducer,
+    tasks: tasksReducer,
 });
 
-export const rootReducer = persistReducer(persistConfig, combineReducer);
+export type RootState = ReturnType<typeof rootReducer>;

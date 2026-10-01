@@ -1,4 +1,5 @@
-import { useForm, Controller } from "react-hook-form";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
     Dialog,
     DialogContent,
@@ -19,24 +20,67 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-// import type { RootState } from "@/redux/store";
-// import { selectTaskById } from "@/redux/features/tasks/tasks.selector";
 import {
     PRIORITY_LABEL,
     STATUS_LABEL,
     TASK_PRIORITY,
     TASK_STATUS,
+    type ITaskInput,
 } from "@/redux/features/tasks";
+import { selectTaskById } from "@/redux/features/tasks/tasks.selector";
+import { addTask, updateTask } from "@/redux/features/tasks/tasks.slice";
 
-export function TaskFormDialog({ open, mode, onClose }) {
-    const { register, handleSubmit, control } = useForm();
+export type DialogMode = "create" | "edit";
+
+interface TaskFormDialogProps {
+    open: boolean;
+    mode: DialogMode;
+    editingId: string | null;
+    onClose: () => void;
+}
+
+export function TaskFormDialog({
+    open,
+    mode,
+    editingId,
+    onClose,
+}: TaskFormDialogProps) {
+    const { register, handleSubmit, control, reset } = useForm<ITaskInput>();
     const dispatch = useAppDispatch();
-    // const editing = useAppSelector((state: RootState) =>
-    //     editingId ? selectTaskById(state, editingId) : undefined,
-    // );
+    const editing = useAppSelector((state) =>
+        editingId ? selectTaskById(state, editingId) : undefined,
+    );
 
-    const onSubmit = (values) => {
-        console.log(values);
+    useEffect(() => {
+        if (!open) return;
+        reset(
+            mode === "edit" && editing
+                ? {
+                      title: editing.title,
+                      description: editing.description,
+                      priority: editing.priority,
+                      status: editing.status,
+                  }
+                : {
+                      title: "",
+                      description: "",
+                      priority: TASK_PRIORITY[0],
+                      status: TASK_STATUS[0],
+                  },
+        );
+    }, [editing, mode, open, reset]);
+
+    const onSubmit = (values: ITaskInput) => {
+        const change = {
+            ...values,
+            title: values.title.trim(),
+            description: values.description.trim(),
+        };
+        if (mode === "edit" && editingId) {
+            dispatch(updateTask({ id: editingId, change }));
+        } else {
+            dispatch(addTask(change));
+        }
         onClose();
     };
 
