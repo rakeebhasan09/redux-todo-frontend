@@ -6,7 +6,6 @@ import { baseAPI } from "./baseAPI";
 export const rootReducer = combineReducers({
     [baseAPI.reducerPath]: baseAPI.reducer,
     filters: filtersReducer,
-    tasks: tasksReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

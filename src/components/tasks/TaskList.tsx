@@ -2,15 +2,20 @@ import { TaskItem } from "./TaskItem";
 import { Card } from "@/components/ui/card";
 import { ClipboardListIcon, FilterIcon } from "lucide-react";
 import { selectFilters } from "@/redux/features/filters";
-import {
-    selectFilteredTasks,
-    selectTotalTasks,
-} from "@/redux/features/tasks/tasks.selector";
+// import { selectFilteredTasks } from "@/redux/features/tasks/tasks.selector";
 import { useAppSelector } from "@/redux/hooks";
+import { useGetTasksQuery } from "@/redux/baseAPI";
 
 export function TaskList({ onEdit }: { onEdit: (id: string) => void }) {
-    const tasks = useAppSelector(selectFilteredTasks);
-    const total = useAppSelector(selectTotalTasks);
+    const { data, isLoading, isFetching } = useGetTasksQuery(undefined);
+
+    // console.log("taskData", taskData);
+
+    const tasks = data?.data ?? [];
+    const pagination = data?.pagination;
+
+    const total = tasks.length;
+
     const filters = useAppSelector(selectFilters);
     const isFiltering =
         Boolean(filters.query.trim()) ||

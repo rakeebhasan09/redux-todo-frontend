@@ -1,9 +1,13 @@
 import { Card } from "@/components/ui/card";
-import { selectTaskStats } from "@/redux/features/tasks/tasks.selector";
-import { useAppSelector } from "@/redux/hooks";
+// import { selectTaskStats } from "@/redux/features/tasks/tasks.selector";
+// import { useAppSelector } from "@/redux/hooks";
 
 export function TaskStats() {
-    const stats = useAppSelector(selectTaskStats);
+    const stats = {
+        byStatus: { pending: 0, "in-progress": 0, done: 0 },
+        total: 0,
+        byPriority: { high: 0, medium: 0, low: 0 },
+    };
 
     const items: Array<{ label: string; value: number; tone: string }> = [
         { label: "Total", value: stats.total, tone: "text-foreground" },
