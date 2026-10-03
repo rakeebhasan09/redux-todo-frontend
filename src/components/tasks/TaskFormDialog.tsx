@@ -29,6 +29,8 @@ import {
 } from "@/redux/features/tasks";
 import { selectTaskById } from "@/redux/features/tasks/tasks.selector";
 import { addTask, updateTask } from "@/redux/features/tasks/tasks.slice";
+import { useCreateTaskMutation } from "@/redux/baseAPI";
+import { toast } from "sonner";
 
 export type DialogMode = "create" | "edit";
 
@@ -46,42 +48,42 @@ export function TaskFormDialog({
     onClose,
 }: TaskFormDialogProps) {
     const { register, handleSubmit, control, reset } = useForm<ITaskInput>();
-    const dispatch = useAppDispatch();
-    const editing = useAppSelector((state) =>
-        editingId ? selectTaskById(state, editingId) : undefined,
-    );
+    const [createTask, { isLoading }] = useCreateTaskMutation();
+    console.log("createTaskReturn", createTask);
+    // const dispatch = useAppDispatch();
+    // const editing = useAppSelector((state) =>
+    //     editingId ? selectTaskById(state, editingId) : undefined,
+    // );
 
-    useEffect(() => {
-        if (!open) return;
-        reset(
-            mode === "edit" && editing
-                ? {
-                      title: editing.title,
-                      description: editing.description,
-                      priority: editing.priority,
-                      status: editing.status,
-                  }
-                : {
-                      title: "",
-                      description: "",
-                      priority: TASK_PRIORITY[0],
-                      status: TASK_STATUS[0],
-                  },
-        );
-    }, [editing, mode, open, reset]);
+    // useEffect(() => {
+    //     if (!open) return;
+    //     reset(
+    //         mode === "edit" && editing
+    //             ? {
+    //                   title: editing.title,
+    //                   description: editing.description,
+    //                   priority: editing.priority,
+    //                   status: editing.status,
+    //               }
+    //             : {
+    //                   title: "",
+    //                   description: "",
+    //                   priority: TASK_PRIORITY[0],
+    //                   status: TASK_STATUS[0],
+    //               },
+    //     );
+    // }, [editing, mode, open, reset]);
 
-    const onSubmit = (values: ITaskInput) => {
-        const change = {
-            ...values,
-            title: values.title.trim(),
-            description: values.description.trim(),
-        };
-        if (mode === "edit" && editingId) {
-            dispatch(updateTask({ id: editingId, change }));
-        } else {
-            dispatch(addTask(change));
+    const onSubmit = async (values: ITaskInput) => {
+        try {
+            const res = await createTask(values).unwrap();
+            if (res.id) {
+                toast.success("Task created successfully!");
+            }
+        } catch (error) {
+            console.error("Error creating task:", error);
+            toast.error("Failed to create task.");
         }
-        onClose();
     };
 
     return (
